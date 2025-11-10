@@ -12,7 +12,7 @@ Multi-modal similarity measures for pairs trading, inspired by spreadsheet templ
 ### Installation
 ```bash
 # Create conda environment
-conda create -n pairs-trading python=3.10
+conda create -n pairs-trading python=3.11
 conda activate pairs-trading
 
 # Install dependencies
