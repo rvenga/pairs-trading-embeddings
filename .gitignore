@@ -1,4 +1,35 @@
-__pycache__/ 
-*.pyc 
-data/raw/ 
-.env 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+*.egg-info/
+dist/
+build/
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Data
+data/raw/
+data/processed/
+*.csv
+*.parquet
+
+# Environment
+.env
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
