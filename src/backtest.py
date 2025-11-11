@@ -43,7 +43,10 @@ def backtest_pair(price1, price2, hedge_ratio,
     cum_pnl_after_costs = cum_pnl - trade_costs.cumsum()
     
     # Calculate metrics
+    # Annualized return (dynamically calculated based on actual data length)
+    num_days = len(cum_pnl_after_costs)
     total_return = cum_pnl_after_costs.iloc[-1]
+    annualized_return = (1 + total_return) ** (252 / num_days) - 1 if num_days > 0 else 0
     
     # Sharpe ratio (annualized, assuming 252 trading days)
     daily_returns = cum_pnl_after_costs.diff().fillna(0)
@@ -70,7 +73,7 @@ def backtest_pair(price1, price2, hedge_ratio,
     win_rate = sum(1 for r in trade_returns if r > 0) / len(trade_returns) if trade_returns else 0
     
     return {
-        'total_return': total_return,
+        'annualized_return': annualized_return,
         'sharpe_ratio': sharpe,
         'max_drawdown': max_drawdown,
         'num_trades': num_trades,
@@ -120,7 +123,7 @@ def backtest_portfolio(prices_df, pairs_df):
         results.append({
             'Ticker1': ticker1,
             'Ticker2': ticker2,
-            'Total_Return': metrics['total_return'],
+            'Annualized_Return': metrics['annualized_return'],
             'Sharpe_Ratio': metrics['sharpe_ratio'],
             'Max_Drawdown': metrics['max_drawdown'],
             'Num_Trades': metrics['num_trades'],

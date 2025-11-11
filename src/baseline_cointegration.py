@@ -9,6 +9,10 @@ from pathlib import Path
 from cointegration import find_cointegrated_pairs, split_train_test
 from backtest import backtest_portfolio
 
+# Configuration
+TRAIN_RATIO = 0.7  # 70% train, 30% test
+MAX_PAIRS = 15
+
 
 def main():
     # Paths
@@ -18,7 +22,7 @@ def main():
     
     print("=" * 60)
     print("BASELINE: Traditional Cointegration Pairs Trading")
-    print("WITH TRAIN-TEST SPLIT (70/30)")
+    print(f"WITH TRAIN-TEST SPLIT ({int(TRAIN_RATIO*100)}/{int((1-TRAIN_RATIO)*100)})")
     print("=" * 60)
     
     # Load data
@@ -28,12 +32,12 @@ def main():
     print(f"   Date range: {prices['Date'].min()} to {prices['Date'].max()}")
     
     # Split into train and test
-    print("\n2. Splitting data into train (70%) and test (30%)...")
-    train_prices, test_prices = split_train_test(prices, train_ratio=0.7)
+    print(f"\n2. Splitting data into train ({int(TRAIN_RATIO*100)}%) and test ({int((1-TRAIN_RATIO)*100)}%)...")
+    train_prices, test_prices = split_train_test(prices, train_ratio=TRAIN_RATIO)
     
     # Find cointegrated pairs on TRAINING data only
     print("\n3. Finding cointegrated pairs on TRAINING data...")
-    pairs = find_cointegrated_pairs(train_prices, max_pairs=15)
+    pairs = find_cointegrated_pairs(train_prices, max_pairs=MAX_PAIRS)
     pairs.to_csv(OUTPUT_DIR / "cointegrated_pairs.csv", index=False)
     print(f"   Found {len(pairs)} pairs")
     print(f"   Saved to {OUTPUT_DIR / 'cointegrated_pairs.csv'}")
@@ -53,14 +57,14 @@ def main():
     print("RESULTS SUMMARY (Out-of-Sample)")
     print("=" * 60)
     print(f"\nTotal pairs tested: {len(test_results)}")
-    print(f"Average return: {test_results['Total_Return'].mean():.2%}")
+    print(f"Average annualized return: {test_results['Annualized_Return'].mean():.2%}")
     print(f"Average Sharpe: {test_results['Sharpe_Ratio'].mean():.2f}")
     print(f"Average max drawdown: {test_results['Max_Drawdown'].mean():.2%}")
     print(f"Average trades: {test_results['Num_Trades'].mean():.0f}")
     print(f"Average win rate: {test_results['Win_Rate'].mean():.2%}")
     
     print("\n=== TOP 5 PAIRS BY SHARPE ===")
-    print(test_results.nlargest(5, 'Sharpe_Ratio')[['Ticker1', 'Ticker2', 'Sharpe_Ratio', 'Total_Return']])
+    print(test_results.nlargest(5, 'Sharpe_Ratio')[['Ticker1', 'Ticker2', 'Sharpe_Ratio', 'Annualized_Return']])
     
     print("\n✓ Baseline complete!")
     print("\nNote: All results are out-of-sample (test set only).")
