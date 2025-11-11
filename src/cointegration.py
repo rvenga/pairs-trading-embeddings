@@ -10,6 +10,35 @@ from itertools import combinations
 from tqdm import tqdm
 
 
+def split_train_test(prices_df, train_ratio=0.7):
+    """
+    Split price data into train and test sets chronologically.
+    
+    Args:
+        prices_df: DataFrame with columns [Date, Ticker, Close, ...]
+        train_ratio: Proportion of data for training (default 0.7)
+        
+    Returns:
+        tuple of (train_df, test_df)
+    """
+    # Get unique sorted dates
+    dates = prices_df['Date'].sort_values().unique()
+    
+    # Calculate split point
+    split_idx = int(len(dates) * train_ratio)
+    split_date = dates[split_idx]
+    
+    # Split data
+    train_df = prices_df[prices_df['Date'] < split_date].copy()
+    test_df = prices_df[prices_df['Date'] >= split_date].copy()
+    
+    print(f"Train period: {train_df['Date'].min()} to {train_df['Date'].max()}")
+    print(f"Test period: {test_df['Date'].min()} to {test_df['Date'].max()}")
+    print(f"Train size: {len(train_df)} rows, Test size: {len(test_df)} rows")
+    
+    return train_df, test_df
+
+
 def test_cointegration(price1, price2):
     """
     Test if two price series are cointegrated using Engle-Granger method.

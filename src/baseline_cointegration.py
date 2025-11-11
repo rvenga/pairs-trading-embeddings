@@ -1,11 +1,12 @@
 """
 Traditional cointegration-based pairs trading baseline.
 End-to-end pipeline: data → pairs → backtest → results.
+Implements train-test split to prevent data leakage.
 """
 
 import pandas as pd
 from pathlib import Path
-from cointegration import find_cointegrated_pairs
+from cointegration import find_cointegrated_pairs, split_train_test
 from backtest import backtest_portfolio
 
 
@@ -17,41 +18,52 @@ def main():
     
     print("=" * 60)
     print("BASELINE: Traditional Cointegration Pairs Trading")
+    print("WITH TRAIN-TEST SPLIT (70/30)")
     print("=" * 60)
     
     # Load data
     print("\n1. Loading data...")
     prices = pd.read_csv(DATA_DIR / "prices.csv", parse_dates=['Date'])
     print(f"   Loaded {len(prices)} price observations")
+    print(f"   Date range: {prices['Date'].min()} to {prices['Date'].max()}")
     
-    # Find cointegrated pairs
-    print("\n2. Finding cointegrated pairs...")
-    pairs = find_cointegrated_pairs(prices, max_pairs=15)
+    # Split into train and test
+    print("\n2. Splitting data into train (70%) and test (30%)...")
+    train_prices, test_prices = split_train_test(prices, train_ratio=0.7)
+    
+    # Find cointegrated pairs on TRAINING data only
+    print("\n3. Finding cointegrated pairs on TRAINING data...")
+    pairs = find_cointegrated_pairs(train_prices, max_pairs=15)
     pairs.to_csv(OUTPUT_DIR / "cointegrated_pairs.csv", index=False)
     print(f"   Found {len(pairs)} pairs")
     print(f"   Saved to {OUTPUT_DIR / 'cointegrated_pairs.csv'}")
     
-    # Backtest
-    print("\n3. Backtesting pairs...")
-    results = backtest_portfolio(prices, pairs)
-    results.to_csv(OUTPUT_DIR / "backtest_results.csv", index=False)
+    if len(pairs) == 0:
+        print("\n⚠ No cointegrated pairs found. Exiting.")
+        return
+    
+    # Backtest on TEST data only (out-of-sample)
+    print("\n4. Backtesting on TEST data (out-of-sample)...")
+    test_results = backtest_portfolio(test_prices, pairs)
+    test_results.to_csv(OUTPUT_DIR / "backtest_results.csv", index=False)
     print(f"   Saved to {OUTPUT_DIR / 'backtest_results.csv'}")
     
     # Summary statistics
     print("\n" + "=" * 60)
-    print("RESULTS SUMMARY")
+    print("RESULTS SUMMARY (Out-of-Sample)")
     print("=" * 60)
-    print(f"\nTotal pairs tested: {len(results)}")
-    print(f"Average return: {results['Total_Return'].mean():.2%}")
-    print(f"Average Sharpe: {results['Sharpe_Ratio'].mean():.2f}")
-    print(f"Average max drawdown: {results['Max_Drawdown'].mean():.2%}")
-    print(f"Average trades: {results['Num_Trades'].mean():.0f}")
-    print(f"Average win rate: {results['Win_Rate'].mean():.2%}")
+    print(f"\nTotal pairs tested: {len(test_results)}")
+    print(f"Average return: {test_results['Total_Return'].mean():.2%}")
+    print(f"Average Sharpe: {test_results['Sharpe_Ratio'].mean():.2f}")
+    print(f"Average max drawdown: {test_results['Max_Drawdown'].mean():.2%}")
+    print(f"Average trades: {test_results['Num_Trades'].mean():.0f}")
+    print(f"Average win rate: {test_results['Win_Rate'].mean():.2%}")
     
     print("\n=== TOP 5 PAIRS BY SHARPE ===")
-    print(results.nlargest(5, 'Sharpe_Ratio')[['Ticker1', 'Ticker2', 'Sharpe_Ratio', 'Total_Return']])
+    print(test_results.nlargest(5, 'Sharpe_Ratio')[['Ticker1', 'Ticker2', 'Sharpe_Ratio', 'Total_Return']])
     
     print("\n✓ Baseline complete!")
+    print("\nNote: All results are out-of-sample (test set only).")
 
 
 if __name__ == "__main__":

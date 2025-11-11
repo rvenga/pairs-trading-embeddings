@@ -18,16 +18,17 @@ def compute_spread(price1, price2, hedge_ratio):
 
 def compute_z_score(spread, window=60):
     """
-    Compute rolling z-score of spread.
+    Compute expanding z-score of spread.
     
     z = (spread - mean) / std
     
-    Uses rolling window for mean and std.
+    Uses expanding window for mean and std to prevent lookahead bias.
+    Only uses past data (no future information).
     """
-    rolling_mean = spread.rolling(window=window).mean()
-    rolling_std = spread.rolling(window=window).std()
+    expanding_mean = spread.expanding(min_periods=window).mean()
+    expanding_std = spread.expanding(min_periods=window).std()
     
-    z_score = (spread - rolling_mean) / rolling_std
+    z_score = (spread - expanding_mean) / expanding_std
     
     return z_score
 

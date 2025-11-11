@@ -5,7 +5,7 @@ Multi-modal similarity measures for pairs trading, inspired by spreadsheet templ
 ## Setup
 
 ### Prerequisites
-- Python 3.10+
+- Python 3.11+
 - Conda
 - Poetry
 
