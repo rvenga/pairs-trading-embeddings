@@ -32,10 +32,6 @@ def split_train_test(prices_df, train_ratio=0.7):
     train_df = prices_df[prices_df['Date'] < split_date].copy()
     test_df = prices_df[prices_df['Date'] >= split_date].copy()
     
-    print(f"Train period: {train_df['Date'].min()} to {train_df['Date'].max()}")
-    print(f"Test period: {test_df['Date'].min()} to {test_df['Date'].max()}")
-    print(f"Train size: {len(train_df)} rows, Test size: {len(test_df)} rows")
-    
     return train_df, test_df
 
 
@@ -94,9 +90,7 @@ def find_cointegrated_pairs(prices_df, tickers=None, max_pairs=None):
     # Test all combinations
     results = []
     
-    print(f"Testing {len(list(combinations(tickers, 2)))} pairs for cointegration...")
-    
-    for ticker1, ticker2 in tqdm(list(combinations(tickers, 2))):
+    for ticker1, ticker2 in tqdm(list(combinations(tickers, 2)), desc="Testing pairs"):
         # Get price series (drop NaNs)
         series1 = price_pivot[ticker1].dropna()
         series2 = price_pivot[ticker2].dropna()
@@ -124,15 +118,12 @@ def find_cointegrated_pairs(prices_df, tickers=None, max_pairs=None):
     pairs_df = pd.DataFrame(results)
     
     if len(pairs_df) == 0:
-        print("No cointegrated pairs found!")
         return pairs_df
     
     pairs_df = pairs_df.sort_values('P_Value')
     
     if max_pairs is not None:
         pairs_df = pairs_df.head(max_pairs)
-    
-    print(f"\nFound {len(pairs_df)} cointegrated pairs (p < 0.05)")
     
     return pairs_df
 

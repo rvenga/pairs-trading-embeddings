@@ -28,19 +28,19 @@ def main():
     # Load data
     print("\n1. Loading data...")
     prices = pd.read_csv(DATA_DIR / "prices.csv", parse_dates=['Date'])
-    print(f"   Loaded {len(prices)} price observations")
-    print(f"   Date range: {prices['Date'].min()} to {prices['Date'].max()}")
+    print(f"   {len(prices)} rows | {prices['Date'].min().date()} to {prices['Date'].max().date()}")
     
     # Split into train and test
-    print(f"\n2. Splitting data into train ({int(TRAIN_RATIO*100)}%) and test ({int((1-TRAIN_RATIO)*100)}%)...")
+    print(f"\n2. Splitting data ({int(TRAIN_RATIO*100)}/{int((1-TRAIN_RATIO)*100)})...")
     train_prices, test_prices = split_train_test(prices, train_ratio=TRAIN_RATIO)
+    print(f"   Train: {train_prices['Date'].min().date()} to {train_prices['Date'].max().date()} ({len(train_prices)} rows)")
+    print(f"   Test:  {test_prices['Date'].min().date()} to {test_prices['Date'].max().date()} ({len(test_prices)} rows)")
     
     # Find cointegrated pairs on TRAINING data only
     print("\n3. Finding cointegrated pairs on TRAINING data...")
     pairs = find_cointegrated_pairs(train_prices, max_pairs=MAX_PAIRS)
     pairs.to_csv(OUTPUT_DIR / "cointegrated_pairs.csv", index=False)
-    print(f"   Found {len(pairs)} pairs")
-    print(f"   Saved to {OUTPUT_DIR / 'cointegrated_pairs.csv'}")
+    print(f"   {len(pairs)} pairs found (p < 0.05)")
     
     if len(pairs) == 0:
         print("\n⚠ No cointegrated pairs found. Exiting.")
@@ -50,7 +50,7 @@ def main():
     print("\n4. Backtesting on TEST data (out-of-sample)...")
     test_results = backtest_portfolio(test_prices, pairs)
     test_results.to_csv(OUTPUT_DIR / "backtest_results.csv", index=False)
-    print(f"   Saved to {OUTPUT_DIR / 'backtest_results.csv'}")
+    print(f"   Complete")
     
     # Summary statistics
     print("\n" + "=" * 60)
