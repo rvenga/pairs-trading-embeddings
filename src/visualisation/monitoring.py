@@ -5,15 +5,23 @@ Shows when pairs stopped and why.
 
 import pandas as pd
 import matplotlib.pyplot as plt
-from pathlib import Path
 import seaborn as sns
+from pathlib import Path
+import sys
+
+#TODO: Move this to make import work for all scripts
+# Add project root to path for imports
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from src.config import DATA_DIR, VISUALIZATION_DIR
 
 # Set style
 sns.set_style('whitegrid')
 
 # Load results
-results_no_mon = pd.read_csv("data/processed/backtest_no_monitoring.csv")
-results_with_mon = pd.read_csv("data/processed/backtest_with_monitoring.csv")
+results_no_mon = pd.read_csv(DATA_DIR / "processed" / "backtest_no_monitoring.csv")
+results_with_mon = pd.read_csv(DATA_DIR / "processed" / "backtest_with_monitoring.csv")
 
 # Create comparison plot
 fig, axes = plt.subplots(2, 2, figsize=(14, 10))
@@ -88,15 +96,15 @@ table.scale(1, 2)
 axes[1, 1].set_title('Summary Statistics', pad=20)
 
 plt.tight_layout()
-plt.savefig('data/monitoring_comparison.png', dpi=150, bbox_inches='tight')
-print("✓ Saved: data/monitoring_comparison.png")
+plt.savefig(VISUALIZATION_DIR / "monitoring" / "comparison.png", dpi=150, bbox_inches='tight')
+print("✓ Saved: " + str(VISUALIZATION_DIR / "monitoring" / "comparison.png"))
 
 # Plot individual monitoring logs
 print("\nGenerating individual pair monitoring plots...")
-log_files = list(Path("data/processed").glob("monitoring_log_*.csv"))
+log_files = list(DATA_DIR / "processed" / "monitoring_log_*.csv")
 
 for log_file in log_files[:3]:  # Plot first 3 as examples
-    pair_name = log_file.stem.replace('monitoring_log_', '')
+    pair_name = log_file.name.replace('monitoring_log_', '')
     
     log = pd.read_csv(log_file)
     log['Date'] = pd.to_datetime(log['Date'])
@@ -116,7 +124,7 @@ for log_file in log_files[:3]:  # Plot first 3 as examples
     ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig(f'data/monitoring_{pair_name}.png', dpi=150)
+    plt.savefig(VISUALIZATION_DIR / "monitoring" / f"{pair_name}.png", dpi=150)
     
 print(f"✓ Generated {len(log_files[:3])} monitoring plots")
 print("\n✓ All visualizations complete!")

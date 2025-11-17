@@ -6,32 +6,11 @@ Fetches price data and company info from Yahoo Finance.
 import pandas as pd
 import numpy as np
 import yfinance as yf
-from datetime import datetime
-from pathlib import Path
 import time
 from tqdm import tqdm
 
+from config import DATA_DIR, START_DATE, END_DATE, TEST_TICKERS
 
-# Configuration
-DATA_DIR = Path("data/raw")
-DATA_DIR.mkdir(parents=True, exist_ok=True)
-
-START_DATE = "2019-01-01"
-END_DATE = "2024-11-01"
-
-# Small test universe - 25 stocks across sectors
-TEST_TICKERS = [
-    # Tech
-    "AAPL", "MSFT", "GOOGL", "META", "NVDA",
-    # Finance
-    "JPM", "BAC", "GS", "MS", "C",
-    # Consumer
-    "WMT", "TGT", "COST", "HD", "LOW",
-    # Healthcare
-    "JNJ", "PFE", "UNH", "CVS", "ABBV",
-    # Energy
-    "XOM", "CVX", "COP", "SLB", "EOG"
-]
 
 
 def fetch_price_data(tickers, start_date, end_date):
@@ -80,6 +59,7 @@ def fetch_company_info(tickers):
         try:
             stock = yf.Ticker(ticker)
             info = stock.info
+        
             
             company_data.append({
                 'Ticker': ticker,
