@@ -21,7 +21,7 @@ from src.config import DATA_DIR, VISUALIZATION_DIR
 
 def load_data():
     """Load fundamental data."""
-    fundamentals = pd.read_csv(DATA_DIR / "fundamentals.csv")
+    fundamentals = pd.read_csv(DATA_DIR / "raw" / "fundamentals.csv")
     fundamentals['Date'] = pd.to_datetime(fundamentals['Date'])
     return fundamentals
 
@@ -67,7 +67,7 @@ def plot_time_series(fundamentals):
     
     plt.tight_layout()
     plt.savefig(VISUALIZATION_DIR / "fundamentals" / "timeseries.png", bbox_inches='tight')
-    print(f"✓ Saved: {VISUALIZATION_DIR / "fundamentals" / "timeseries.png"}")
+    print(f"✓ Saved: {VISUALIZATION_DIR / 'fundamentals' / 'timeseries.png'}")
     plt.close()
 
 
@@ -113,7 +113,7 @@ def plot_distributions(fundamentals):
     
     plt.tight_layout()
     plt.savefig(VISUALIZATION_DIR / "fundamentals" / "distributions.png", bbox_inches='tight')
-    print(f"✓ Saved: {VISUALIZATION_DIR / "fundamentals" / "distributions.png"}")
+    print(f"✓ Saved: {VISUALIZATION_DIR / 'fundamentals' / 'distributions.png'}")
     plt.close()
 
 
@@ -148,7 +148,7 @@ def plot_correlation_heatmap(fundamentals):
     
     plt.tight_layout()
     plt.savefig(VISUALIZATION_DIR / "fundamentals" / "correlation.png", bbox_inches='tight')
-    print(f"✓ Saved: {VISUALIZATION_DIR / "fundamentals" / "correlation.png"}")
+    print(f"✓ Saved: {VISUALIZATION_DIR / 'fundamentals' / 'correlation.png'}")
     plt.close() 
 
 
@@ -197,7 +197,7 @@ def plot_sector_comparison(fundamentals):
     
     plt.tight_layout()
     plt.savefig(VISUALIZATION_DIR / "fundamentals" / "sector_comparison.png", bbox_inches='tight')
-    print(f"✓ Saved: {VISUALIZATION_DIR / "fundamentals" / "sector_comparison.png"}")
+    print(f"✓ Saved: {VISUALIZATION_DIR / 'fundamentals' / 'sector_comparison.png'}")
     plt.close()
 
 
@@ -356,7 +356,7 @@ def plot_dashboard(fundamentals):
     fig.suptitle('Fundamental Data Dashboard', fontsize=18, fontweight='bold', y=0.98)
     
     plt.savefig(VISUALIZATION_DIR / "fundamentals" / "dashboard.png", bbox_inches='tight')
-    print(f"✓ Saved: {VISUALIZATION_DIR / "fundamentals" / "dashboard.png"}")
+    print(f"✓ Saved: {VISUALIZATION_DIR / 'fundamentals' / 'dashboard.png'}")
     plt.close()
 
 
